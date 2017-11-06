@@ -23,28 +23,28 @@ var connector = new builder.ChatConnector({
 server.post('/api/messages', connector.listen());
 
 //create a array of key words (internts)
-var arr = [['total tax', 'total_tax'],
-    ['total sales', 'total_sales'],
+var arr = [['total tax', 'totalTax'],
     ['quantity by category', 'quantityByCategory'],
-    ['sales by branch', 'sales_by_branch'],
-    ['sales by category', 'sales_by_cate'],
-    ['sales by category in woolwich extra', 'sales_by_cate_woolwich_extra'],
-    ['sales by department', 'sales_dep'],
-    ['sales in woolwich extra', 'sales_woolwich_extra'],
-    ['tax by branch', 'tax_by_branch'],
-    ['total discount', 'total_discount'],
-    ['total sales after discount', 'total_sales_aft_discount'],
-    ['sales at different time', 'sales_at_diff_time']
+    ['sales by branch', 'salesAcrossBranch'],
+    ['sales across category', 'salesAcrossCategory'],
+    ['sales across category in woolwich', 'salesAcrossCategoryInWool'],
+    ['sales across department', 'salesAcrossDepartment'],
+    ['sales in woolwich', 'salesInWool'],
+    ['tax across branch', 'taxAcrossBranch'],
+    ['total discount', 'totalDiscount'],
+    ['total sales after discount', 'totalSalesAfterDiscount'],
+    ['sales on', 'salesOn1-4-16 11-12']
 ];
 var map = new Map(arr);
 
 
 var functions = {
     quantityByCategory: function(){
-        request('file:///Users/admin/Documents/GitHub/ava-version1/quantityByCategory.html', (error, response, body) => {
-            console.log('html reached!!!!!');
-        });
-        var svg = dimple.newSvg("#chartContainer", 590, 400);
+        // request('file:///Users/admin/Documents/GitHub/ava-version1/quantityByCategory.html', (error, response, body) => {
+        //     console.log('html reached!!!!!');
+        // });
+        // httpGet('file:///Users/admin/Documents/GitHub/ava-version1/quantityByCategory.html');
+        var svg = dimple.newSvg("body", 590, 400);
         var width = 300, height = 300;
         d3.csv("supermarket.csv", function (data) {
           var myChart = new dimple.chart(svg, data);
@@ -215,8 +215,39 @@ var bot = new builder.UniversalBot(connector, [
     function(session, results){
         var str = results.response;
         processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
+    },
+    function(session, results){
+        var str = results.response;
+        processQuestion(session, str);
     }
-
 ]);
 
 // Ask the user for their name and greet them by name.
@@ -250,10 +281,10 @@ function sendChart(session){
     var key = null;
     for (i=0; i<arr.length; i++){
         if (question.includes(arr[i][0])){
-            key = arr[i];
-            functions['quantityByCategory']();
+            key = arr[i][1];
+            // functions['quantityByCategory']();
             // url = __dirname + '/charts/${quantityByCategory}.png';
-            url = __dirname + '/images/big-image.png';
+            url = __dirname + '/images/'+ key + '.png';
             var msg = getChart(session, url);
             session.send(msg);
         }
@@ -279,6 +310,13 @@ function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
+}
+
+function httpGet(theUrl){
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
 }
 
 //____________________________________________________________-------------------------------------------------------------------------

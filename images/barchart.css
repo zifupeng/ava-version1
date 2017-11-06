@@ -1,0 +1,18 @@
+html, body{
+  margin: 0;
+  height: 100%;
+}
+.bar{
+  fill:blue;
+  stroke : black;
+  stroke-width: 3
+}
+
+.bar:hover{
+  fill: red
+}
+
+.text{
+  fill:white;
+  font-family: sans-serif;
+}
