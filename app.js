@@ -23,17 +23,17 @@ var connector = new builder.ChatConnector({
 server.post('/api/messages', connector.listen());
 
 //create a array of key words (internts)
-var arr = [['total tax', 'totalTax'],
-    ['quantity by category', 'quantityByCategory'],
-    ['sales by branch', 'salesAcrossBranch'],
-    ['sales across category', 'salesAcrossCategory'],
-    ['sales across category in woolwich', 'salesAcrossCategoryInWool'],
-    ['sales across department', 'salesAcrossDepartment'],
+var arr = [['total tax', 'heh4sb/totalTax'],
+    ['quantity by category', 'quantity_By_Category'],
+    ['sales across branch', 'jR4jsb/sales_Across_Branch'],
+    ['sales across category', 'ixPHCb/sales_Across_Category'],
+    ['sales across category in woolwich', 'c3EHCb/sales_Across_Category_In_Wool'],
+    ['sales across department', 'dasR5w/sales_Across_Department'],
     ['sales in woolwich', 'salesInWool'],
-    ['tax across branch', 'taxAcrossBranch'],
-    ['total discount', 'totalDiscount'],
-    ['total sales after discount', 'totalSalesAfterDiscount'],
-    ['sales on', 'salesOn1-4-16 11-12']
+    ['tax across branch', 'hr3oJG/tax_Across_Branch'],
+    ['total discount', 'b5N4sb/total_Discount'],
+    ['total sales after discount', 'cc0Dkw/total_Sales_After_Discount'],
+    ['sales on', 'dtcFyG/sales_On1_4_16_11_12']
 ];
 var map = new Map(arr);
 
