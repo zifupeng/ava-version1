@@ -58,7 +58,6 @@ var functions = {
 
           convertPNG();
         });
-        console.log('reached!!!!!!');
     },
     salesAcrossBranch: function(){
         var svg = dimple.newSvg("#chartContainer", 590, 400);
@@ -257,12 +256,12 @@ bot.dialog('greetings', [
     },
     function (session, results) {
         name = results.response;
-        builder.Prompts.text(session, 'Hello ' + name + '! May I know what can I help you? I am able to answer any question indicated below.What does sales look like across branches? <br>What does sales look like across departments? <br>What does sales look like across categories? <br>What does sales look like in specific_branch?<br>How much are the total discount?<br>What are the total sales after discount?<br>Which category sell better in specific_branch?<br>What are the total tax?<br>Tax across branch?<br>');
+        builder.Prompts.text(session, 'Hello ' + name + '! May I know what can I help you? ');
     }
 ]);
 bot.dialog('askName',
     function (session) {
-        builder.Prompts.text(session, 'Welcome to ABI Visualization bot! May I know how could I address you?');
+        builder.Prompts.text(session, 'Telegram Analytics Buddy is designed for you, as a client of Just Analytics to retrieve data visualisation and get insights from your data. You can also achieve this using chatbot on 2 other platforms — Slack and Skype! It helps you to visualise data based on your query, based on which you can generate insights for strategic decision making. May I know how could I address you?');
     }
 );
 
@@ -270,7 +269,7 @@ function processQuestion(session, str){
     if (str.trim().toLowerCase() !== 'bye'){
         session.dialogData.question = str.toLowerCase();
         var keyword = sendChart(session);
-        builder.Prompts.text(session, "What else would you like to ask me? <br/>How about 'What's the " + arr[getRandomIntInclusive(0,11)][0] + "?'. or type 'Bye' to quit.");
+        builder.Prompts.text(session, "What else would you like to ask me? How about 'What's the " + arr[getRandomIntInclusive(0,11)][0] + "?'. or type 'Bye' to quit.");
     }else{
         session.endDialog('See you next time, ' + name);
     }
