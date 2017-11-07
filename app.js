@@ -301,8 +301,7 @@ function getChart(session, url){
     var msg = new builder.Message(session)
         .addAttachment({
             contentUrl: url,
-            contentType: 'image/png',
-            name: ''
+            contentType: 'image/png'
         });
     return msg;
 }
