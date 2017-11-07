@@ -284,7 +284,8 @@ function sendChart(session){
             key = arr[i][1];
             // functions['quantityByCategory']();
             // url = __dirname + '/charts/${quantityByCategory}.png';
-            url = './images/'+ key + '.png';
+            // url = './images/'+ key + '.png';
+            url = 'https://image.ibb.co/msicCb/quantity_By_Category.png';
             var msg = getChart(session, url);
             session.send(msg);
         }
