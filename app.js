@@ -284,7 +284,7 @@ function sendChart(session){
             key = arr[i][1];
             // functions['quantityByCategory']();
             // url = __dirname + '/charts/${quantityByCategory}.png';
-            url = __dirname + '/images/'+ key + '.png';
+            url = './images/'+ key + '.png';
             var msg = getChart(session, url);
             session.send(msg);
         }
