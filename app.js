@@ -26,7 +26,7 @@ server.post('/api/messages', connector.listen());
 var arr = [['total tax', 'heh4sb/totalTax'],
     ['quantity by category', 'quantity_By_Category'],
     ['sales across branch', 'jR4jsb/sales_Across_Branch'],
-    ['sales across category', 'ixPHCb/sales_Across_Category'],
+    ['sales across categories', 'ixPHCb/sales_Across_Category'],
     ['sales across category in woolwich', 'c3EHCb/sales_Across_Category_In_Wool'],
     ['sales across department', 'dasR5w/sales_Across_Department'],
     ['sales in woolwich', 'salesInWool'],
@@ -302,7 +302,7 @@ function getChart(session, url){
         .addAttachment({
             contentUrl: url,
             contentType: 'image/png',
-            name: 'test image'
+            name: ''
         });
     return msg;
 }
