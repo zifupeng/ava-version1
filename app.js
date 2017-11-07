@@ -285,7 +285,7 @@ function sendChart(session){
             // functions['quantityByCategory']();
             // url = __dirname + '/charts/${quantityByCategory}.png';
             // url = './images/'+ key + '.png';
-            url = 'https://image.ibb.co/msicCb/quantity_By_Category.png';
+            url = 'https://image.ibb.co/msicCb/' + key + '.png';
             var msg = getChart(session, url);
             session.send(msg);
         }
