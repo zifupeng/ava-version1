@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "botbuilder": "^3.8.4",
+    "convert-csv-to-json": "0.0.11",
+    "csvtojson": "^1.1.9",
     "dimple": "git+https://github.com/PMSI-AlignAlytics/dimple.git",
     "express": "^4.16.2",
     "restify": "^5.0.0"
