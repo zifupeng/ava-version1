@@ -4,6 +4,9 @@ const marklogic = require('marklogic');
 const my = require('./my-connection.js');
 const db = marklogic.createDatabaseClient(my.connInfo);
 
+
+const qb = marklogic.queryBuilder;
+
 // //turn csv to json
     // let csvToJson = require('convert-csv-to-json');
     // let fileInputName = 'supermarket.csv';
@@ -39,13 +42,16 @@ csv()
 	db.documents.write(documents).result( 
 	function(response) {
     console.log('Loaded the following documents:');
+
     response.documents.forEach( function(document) {
-     console.log('  ' + document.uri);
+    // console.log('  ' + document.uri);
     });
+
   }, 
 	function(error) {
     console.log(JSON.stringify(error, null, 2));
   }
+	
 );
   })
 
