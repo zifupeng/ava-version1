@@ -17,7 +17,7 @@ const qb = marklogic.queryBuilder;
 	
 	
 // Load documents into the database.
-const csvFilePath='../supermarket.csv'
+const csvFilePath='./supermarket.csv'
 const csv  =require('csvtojson')
 
 var documents =[];
