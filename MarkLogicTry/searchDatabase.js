@@ -1,21 +1,33 @@
-// Search for documents about mammals, using Query By Example.
-// The query returns an array of document descriptors, one per
-// matching document. The descriptor includes the URI and the
-// contents of each document.
+//zifu
 
+//build connection
 const marklogic = require('marklogic');
 const my = require('./my-connection.js');
 
+//initiate queryBuilder
 const db = marklogic.createDatabaseClient(my.connInfo);
 const qb = marklogic.queryBuilder;
 
+console.log("testing"+db.documents)
+
+var resultToReturn = [];
+//qbe query
 db.documents.query(
-  qb.where(qb.byExample({branch: '11111'}))
+
+  qb.where(qb.byExample({branch: 'Woolwich Extra'}))
+  
+//show entire roll of data
+/*).result( function(results) {
+  console.log(JSON.stringify(results, null, 2));
+});*/
+
+//show selected fields of data
 ).result( function(documents) {
-    console.log('Matches for brand = 11111:')
+    console.log('Matches for brand = Woolwich Extra:')
     documents.forEach( function(document) {
-      console.log('\nURI: ' + document.uri);
-      console.log('Info: ' + document.content.prod_name);
+//      console.log('\nURI: ' + document.uri);
+//      console.log(document.content.prod_name);
+		resultToReturn.push(document.content.sales)
     });
 }, function(error) {
     console.log(JSON.stringify(error, null, 2));
