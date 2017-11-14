@@ -5,12 +5,14 @@ var dimple = require('dimple');
 var d3 = require('d3');
 const request = require('request');
 var express = require('express');
+var csvtojson = require('./csvtojson.js')
 
 
 // Setup Restify Server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
-   console.log('%s listening to %s', server.name, server.url); 
+   console.log('%s listening to %s', server.name, server.url);
+   csvtojson.csvtojson();
 });
 
 // Create chat connector for communicating with the Bot Framework Service
@@ -308,7 +310,7 @@ function getChart(session, url){
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
+  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 }
 
 function httpGet(theUrl){
@@ -440,5 +442,3 @@ function httpGet(theUrl){
 
     image.src = imgsrc;
   }
-
-
