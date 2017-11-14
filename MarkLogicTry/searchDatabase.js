@@ -8,7 +8,12 @@ const my = require('./my-connection.js');
 const db = marklogic.createDatabaseClient(my.connInfo);
 const qb = marklogic.queryBuilder;
 
-console.log("testing"+db.documents)
+// console.log("testing before")
+// console.log(db.documents)
+// console.log("testing after")
+
+//console.log(Object.keys(db.document).length)
+// console.log(db.documents.documents)
 
 var resultToReturn = [];
 //qbe query
@@ -23,11 +28,12 @@ db.documents.query(
 
 //show selected fields of data
 ).result( function(documents) {
+	console.log(documents)
     console.log('Matches for brand = Woolwich Extra:')
     documents.forEach( function(document) {
-//      console.log('\nURI: ' + document.uri);
-//      console.log(document.content.prod_name);
-		resultToReturn.push(document.content.sales)
+     console.log('\nURI: ' + document.uri);
+      // console.log(document.content.sales);
+//		resultToReturn.push(document.content.sales)
     });
 }, function(error) {
     console.log(JSON.stringify(error, null, 2));

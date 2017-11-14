@@ -18,6 +18,7 @@ const csvFilePath='../supermarket.csv'
 const csv  =require('csvtojson')
 
 var documents =[];
+// var i=0;
 csv()
   .fromFile(csvFilePath)
   .on('json',(jsonObj)=>{
@@ -25,18 +26,21 @@ csv()
 		uri: "/doc/"+ jsonObj.txn_line+ ".json",
 		content: jsonObj
 	}
+	// i += 1
+	// console.log(jsonObj)
+	// console.log(i)
 	documents.push(documentObj)
   })
   .on('done',(error)=>{
-    console.log(error)
-    console.log("before")
-    console.log(documents)
-    console.log("after")
+    // console.log(error)
+    // console.log("before")
+    // console.log(documents)
+    // console.log("after")
 	db.documents.write(documents).result( 
 	function(response) {
     console.log('Loaded the following documents:');
     response.documents.forEach( function(document) {
-      console.log('  ' + document.uri);
+     console.log('  ' + document.uri);
     });
   }, 
 	function(error) {
@@ -45,5 +49,3 @@ csv()
 );
   })
 
-
-// Load the example documents into the database
