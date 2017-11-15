@@ -5,7 +5,11 @@ var dimple = require('dimple');
 var d3 = require('d3');
 const request = require('request');
 var express = require('express');
-var csvtojson = require('./csvtojson.js')
+var csvtojson = require('./csvtojson.js');
+var HashMap = require('hashmap');
+var doc_to_db = require('./MarkLogicTry/docToDatabase.js');
+const marklogic = require('marklogic');
+const my = require('./MarkLogicTry/my-connection.js');
 
 
 // Setup Restify Server
@@ -27,7 +31,7 @@ server.post('/api/messages', connector.listen());
 //create a array of key words (internts)
 var arr = [['total tax', 'heh4sb/totalTax'],
     ['quantity by category', 'quantity_By_Category'],
-    ['sales across branch', 'jR4jsb/sales_Across_Branch'],
+    ['sales by branch', 'sales_by_branch'],
     ['sales across categories', 'ixPHCb/sales_Across_Category'],
     ['sales across category in woolwich', 'c3EHCb/sales_Across_Category_In_Wool'],
     ['sales across department', 'dasR5w/sales_Across_Department'],
@@ -224,30 +228,6 @@ var bot = new builder.UniversalBot(connector, [
     function(session, results){
         var str = results.response;
         processQuestion(session, str);
-    },
-    function(session, results){
-        var str = results.response;
-        processQuestion(session, str);
-    },
-    function(session, results){
-        var str = results.response;
-        processQuestion(session, str);
-    },
-    function(session, results){
-        var str = results.response;
-        processQuestion(session, str);
-    },
-    function(session, results){
-        var str = results.response;
-        processQuestion(session, str);
-    },
-    function(session, results){
-        var str = results.response;
-        processQuestion(session, str);
-    },
-    function(session, results){
-        var str = results.response;
-        processQuestion(session, str);
     }
 ]);
 
@@ -271,7 +251,7 @@ function processQuestion(session, str){
     if (str.trim().toLowerCase() !== 'bye'){
         session.dialogData.question = str.toLowerCase();
         var keyword = sendChart(session);
-        builder.Prompts.text(session, "What else would you like to ask me? How about 'What's the " + arr[getRandomIntInclusive(0,11)][0] + "?'. or type 'Bye' to quit.");
+        builder.Prompts.text(session, "What else would you like to ask me?  or type 'Bye' to quit.");
     }else{
         session.endDialog('See you next time, ' + name);
     }
@@ -281,15 +261,25 @@ function sendChart(session){
     var question = session.dialogData.question;
     var key = null;
     for (i=0; i<arr.length; i++){
-        if (question.includes(arr[i][0])){
+        // if (question.includes(arr[i][0])){
             key = arr[i][1];
             // functions['quantityByCategory']();
-            // url = __dirname + '/charts/${quantityByCategory}.png';
-            // url = './images/'+ key + '.png';
-            url = 'https://image.ibb.co/' + key + '.png';
-            var msg = getChart(session, url);
-            session.send(msg);
-        }
+            //get hashmap from database
+            // var arr1 = [10,  20, 30, 40,  50, 60,  70, 80,90];
+            // var arr2 = ['Woolwich Extra', 'Deptford Bridge Express', 'Greenwich Metro', 'Stratford City Super Store','Surrey Keys Extra', 'South Kensington Superstore','Fullham Broadway Express', 'Piccadally Extra', 'Canary Wharf Metro'];
+            doc_to_db.doc_to_db();
+            search_db(function doneSearching(totalResults){
+              // while (totalResults[0].length < totalResults[1].length){
+              //   for(var i = 0; i < 1000; i++){var j = i}
+              // }
+              var url = create_url(totalResults);
+              var msg = new builder.Message(session).addAttachment(createHeroCard(session, url));
+              // var msg = getChart(session, url);
+              session.send(msg);
+            });
+            //create chart
+            
+        // }
     }
     if (key == null){
         session.send("Sorry, I don't understand your question");
@@ -297,6 +287,34 @@ function sendChart(session){
     return key;
 }
 
+function create_url(arr_2d){
+  var lable = "" + arr_2d[1][0];
+  var num = "" + arr_2d[0][0];
+  var lable = "" + arr_2d[1][0];
+  for (var i = 1; i < arr_2d[0].length; i++){
+    num += "," + arr_2d[0][i];
+  }
+  for (var i = 1; i < arr_2d[1].length; i++){
+    lable += "|" + arr_2d[1][i];
+  }
+  // return "http://chart.googleapis.com/chart?cht=bvg&chs=400x150&chd=" +  + "&chxt=x,y&chxl=" + chxl;
+  return "http://chart.googleapis.com/chart?cht=bhs&chs=500x600&chd=t:" + num + "&chxt=x,y&chdl=" + lable;
+}
+
+function createHeroCard(session, url) {
+    return new builder.HeroCard(session)
+        .title('Sales by Branch')
+        .subtitle('Using a Chart as Image service...')
+        .text('Build and connect intelligent bots that have charts rendered as images.')
+        .images([
+            builder.CardImage.create(session, url)
+            // builder.CardImage.create(session, 'http://chart.googleapis.com/chart?cht=bvg&chs=250x150&chd=s:Monkeys&chxt=x,y&chxl=0:|Jan|Feb|Mar|Apr|May|Jun|Jul')
+        ])
+        // .buttons([
+        //     builder.CardAction.openUrl(session, 'https://docs.microsoft.com/bot-framework/', 'Get Started')
+        // ])
+        ;
+}
 
 function getChart(session, url){
     var msg = new builder.Message(session)
@@ -327,118 +345,63 @@ function httpGet(theUrl){
 //____________________________________________________________-------------------------------------------------------------------------
 
 
- // Set-up the export button
-  // d3.select('#saveButton').on('click', function(){
+function search_db(callback){
+  const db = marklogic.createDatabaseClient(my.connInfo);
+  const qb = marklogic.queryBuilder;
+  const vb = marklogic.valuesBuilder;
+  var branches = [];
+  var branchesSalesList = [];
+  var totalResults = [];
+  // var map = new HashMap();
 
-  var convertPNG = function (svg, width, height){
-    var svgString = getSVGString(svg.node());
+  db.documents.query(
+    qb.where(
+    qb.parsedFrom('')).slice(0,10000)
+  )
+  .result(
+  function(documents) {
+    console.log('documents results')
+    // console.log(documents)
+    documents.forEach( function(document) {
+      var branch = (document.content.branch);
+      if(!(branches.indexOf(branch) > -1)){
+        branches.push(branch)
+      }
+    })
 
-    console.log(svgString);
-    svgString2Image( svgString, 2*width, 2*height, 'png', save ); // passes Blob and filesize String to the callback
+    for(var i=0; i< branches.length; i++) {
+      var resultToReturn = [];
+      var branch = branches[i];
+      var branchSales = 0;
+      console.log("branch::::" + branch);
+      db.documents.query(
+        qb.where(
+        qb.byExample({branch: branches[i]})).slice(0,10000)
+      )
+      .result(
+      function(documents) {
 
-    function save( dataBlob, filesize ){
-        saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
-    }
-  }
-  // });
-
-  // Below are the functions that handle actual exporting:
-  // getSVGString ( svgNode ) and svgString2Image( svgString, width, height, format, callback )
-  function getSVGString( svgNode ) {
-    svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
-    var cssStyleText = getCSSStyles( svgNode );
-    appendCSS( cssStyleText, svgNode );
-
-    var serializer = new XMLSerializer();
-    var svgString = serializer.serializeToString(svgNode);
-    svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
-    svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
-
-    return svgString;
-
-    function getCSSStyles( parentElement ) {
-        var selectorTextArr = [];
-
-        // Add Parent element Id and Classes to the list
-        selectorTextArr.push( '#'+parentElement.id );
-        for (var c = 0; c < parentElement.classList.length; c++)
-                if ( !contains('.'+parentElement.classList[c], selectorTextArr) )
-                    selectorTextArr.push( '.'+parentElement.classList[c] );
-
-        // Add Children element Ids and Classes to the list
-        var nodes = parentElement.getElementsByTagName("*");
-        for (var i = 0; i < nodes.length; i++) {
-            var id = nodes[i].id;
-            if ( !contains('#'+id, selectorTextArr) )
-                selectorTextArr.push( '#'+id );
-
-            var classes = nodes[i].classList;
-            for (var c = 0; c < classes.length; c++)
-                if ( !contains('.'+classes[c], selectorTextArr) )
-                    selectorTextArr.push( '.'+classes[c] );
-        }
-
-        // Extract CSS Rules
-        var extractedCSSText = "";
-        for (var i = 0; i < document.styleSheets.length; i++) {
-            var s = document.styleSheets[i];
-
-            try {
-                if(!s.cssRules) continue;
-            } catch( e ) {
-                    if(e.name !== 'SecurityError') throw e; // for Firefox
-                    continue;
-                }
-
-            var cssRules = s.cssRules;
-            for (var r = 0; r < cssRules.length; r++) {
-                if ( contains( cssRules[r].selectorText, selectorTextArr ) )
-                    extractedCSSText += cssRules[r].cssText;
-            }
-        }
-
-
-        return extractedCSSText;
-
-        function contains(str,arr) {
-            return arr.indexOf( str ) === -1 ? false : true;
-        }
-
-    }
-
-    function appendCSS( cssText, element ) {
-        var styleElement = document.createElement("style");
-        styleElement.setAttribute("type","text/css");
-        styleElement.innerHTML = cssText;
-        var refNode = element.hasChildNodes() ? element.children[0] : null;
-        element.insertBefore( styleElement, refNode );
-    }
-  }
-
-
-  function svgString2Image( svgString, width, height, format, callback ) {
-    var format = format ? format : 'png';
-
-    var imgsrc = 'data:image/svg+xml;base64,'+ btoa( unescape( encodeURIComponent( svgString ) ) ); // Convert SVG string to data URL
-
-    var canvas = document.createElement("canvas");
-    var context = canvas.getContext("2d");
-
-    canvas.width = width;
-    canvas.height = height;
-
-    var image = new Image();
-    image.onload = function() {
-        context.clearRect ( 0, 0, width, height );
-        context.drawImage(image, 0, 0, width, height);
-
-        canvas.toBlob( function(blob) {
-            var filesize = Math.round( blob.length/1024 ) + ' KB';
-            if ( callback ) callback( blob, filesize );
+      
+        documents.forEach( function(document) {
+        var salesInt = parseInt(document.content.sales);
+        branchSales += salesInt;
         });
+      console.log("branchSales::::" + branchSales);
+      branchesSalesList.push(branchSales);
+      
 
+    }, function(error) {
+        console.log(JSON.stringify(error, null, 2));
+    }
+    )
 
-    };
-
-    image.src = imgsrc;
+    }
+    totalResults.push(branchesSalesList);
+    totalResults.push(branches);
+    return callback(totalResults);
+    }, function(){
+    }, function(error) {
+        console.log(JSON.stringify(error, null, 2));
+    }
+    )
   }

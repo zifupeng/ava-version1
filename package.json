@@ -16,6 +16,7 @@
     "dimple": "git+https://github.com/PMSI-AlignAlytics/dimple.git",
     "express": "^4.16.2",
     "hashmap": "^2.3.0",
+    "marklogic": "^2.0.3",
     "restify": "^5.0.0"
   },
   "devDependencies": {
